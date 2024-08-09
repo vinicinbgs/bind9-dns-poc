@@ -1,0 +1,56 @@
+services:
+  bind9:
+    build:
+      context: .
+      dockerfile: Dockerfile.bind9
+    container_name: bind9
+    ports:
+      - "5353:53/udp"
+      - "5353:53/tcp"
+    volumes:
+      - ./zones:/etc/bind/zones
+      - ./named.conf.local:/etc/bind/named.conf.local
+    networks:
+      mynet:
+        ipv4_address: 172.19.0.2
+
+  app1:
+    image: nginx
+    container_name: app1
+    command: |
+      sh -c "apt update && apt install -y curl && echo "APP1" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
+    depends_on:
+      - bind9
+    ports:
+      - "8081:80"
+    expose:
+      - "80"
+    dns:
+      - 172.19.0.2
+    networks:
+      mynet:
+        ipv4_address: 172.19.0.3
+
+  app2:
+    image: nginx
+    container_name: app2
+    command: |
+      sh -c "apt update && apt install -y curl && echo "APP2" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
+    depends_on:
+      - bind9
+    ports:
+      - "8080:80"
+    expose:
+      - "80"
+    dns:
+      - 172.19.0.2
+    networks:
+      mynet:
+        ipv4_address: 172.19.0.4
+
+networks:
+  mynet:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.19.0.0/24"
