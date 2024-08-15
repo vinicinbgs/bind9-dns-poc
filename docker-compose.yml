@@ -1,18 +1,31 @@
 services:
-  bind9:
+  ns1:
     build:
       context: .
       dockerfile: Dockerfile.bind9
-    container_name: bind9
-    ports:
-      - "5353:53/udp"
-      - "5353:53/tcp"
+      args:
+        - nameserver=ns1
+    container_name: ns1
     volumes:
       - ./zones:/etc/bind/zones
-      - ./named.conf.local:/etc/bind/named.conf.local
+      - ./named.conf.local.ns1:/etc/bind/named.conf.local
     networks:
       mynet:
         ipv4_address: 172.19.0.2
+  
+  ns2:
+    build:
+      context: .
+      dockerfile: Dockerfile.bind9
+      args:
+        - nameserver=ns2
+    container_name: ns2
+    volumes:
+      - ./zones:/etc/bind/zones
+      - ./named.conf.local.ns2:/etc/bind/named.conf.local
+    networks:
+      mynet:
+        ipv4_address: 172.19.0.5
 
   app1:
     build:
@@ -22,13 +35,15 @@ services:
         - app_name=app1
     container_name: app1
     depends_on:
-      - bind9
+      - ns1
+      - ns2
     ports:
       - "8081:80"
     expose:
       - "80"
     dns:
       - 172.19.0.2
+      - 172.19.0.5
     networks:
       mynet:
         ipv4_address: 172.19.0.3
@@ -41,13 +56,15 @@ services:
         - app_name=app2
     container_name: app2
     depends_on:
-      - bind9
+      - ns1
+      - ns2
     ports:
       - "8080:80"
     expose:
       - "80"
     dns:
       - 172.19.0.2
+      - 172.19.0.5
     networks:
       mynet:
         ipv4_address: 172.19.0.4
