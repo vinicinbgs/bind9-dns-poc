@@ -10,8 +10,10 @@ services:
       - ./zones:/etc/bind/zones
       - ./named.conf.local.ns1:/etc/bind/named.conf.local
     networks:
-      mynet:
+      net1:
         ipv4_address: 172.19.0.2
+      net2:
+        ipv4_address: 172.20.0.3
   
   ns2:
     build:
@@ -24,8 +26,21 @@ services:
       - ./zones:/etc/bind/zones
       - ./named.conf.local.ns2:/etc/bind/named.conf.local
     networks:
-      mynet:
+      net1:
         ipv4_address: 172.19.0.5
+
+  ns3:
+    build:
+      context: .
+      dockerfile: Dockerfile.bind9
+      args:
+        - nameserver=ns3
+    container_name: ns3
+    volumes:
+      - ./named.conf.local.ns3:/etc/bind/named.conf.local
+    networks:
+      net2:
+        ipv4_address: 172.20.0.2
 
   app1:
     build:
@@ -42,9 +57,12 @@ services:
     dns:
       - 172.19.0.2
       - 172.19.0.5
+      - 172.20.0.2
     networks:
-      mynet:
+      net1:
         ipv4_address: 172.19.0.3
+      net2:
+        ipv4_address: 172.20.0.4
 
   app2:
     build:
@@ -61,13 +79,19 @@ services:
     dns:
       - 172.19.0.2
       - 172.19.0.5
+      - 172.20.0.2
     networks:
-      mynet:
+      net1:
         ipv4_address: 172.19.0.4
 
 networks:
-  mynet:
+  net1:
     ipam:
       driver: default
       config:
         - subnet: "172.19.0.0/24"
+  net2:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.0.0/24"

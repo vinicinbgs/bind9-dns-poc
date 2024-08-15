@@ -1,14 +1,43 @@
+# # Dockerfile.bind9
+# FROM ubuntu:20.04
+
+# ARG nameserver
+
+# RUN apt-get update && apt-get install -y bind9 bind9utils bind9-doc
+
+# COPY zones /etc/bind/zones
+# COPY named.conf.local.${nameserver} /etc/bind/named.conf.local
+
+# EXPOSE 53/udp
+# EXPOSE 53/tcp
+
+# CMD ["named", "-g", "-c", "/etc/bind/named.conf"]
+
+
 # Dockerfile.bind9
 FROM ubuntu:20.04
 
 ARG nameserver
 
+# Instalar pacotes necessários
 RUN apt-get update && apt-get install -y bind9 bind9utils bind9-doc
 
+# Criar o diretório de trabalho
+WORKDIR /etc/bind
+
+# Copiar arquivos de configuração com as permissões corretas
 COPY zones /etc/bind/zones
 COPY named.conf.local.${nameserver} /etc/bind/named.conf.local
 
+# Definir o usuário e grupo para rodar o BIND9
+RUN chown -R bind:bind /etc/bind /var/cache/bind /var/log
+
+# Expor as portas do DNS (53 UDP e TCP)
 EXPOSE 53/udp
 EXPOSE 53/tcp
 
+# Rodar o BIND9 com o usuário `bind`
+USER bind
+
+# Iniciar o BIND9
 CMD ["named", "-g", "-c", "/etc/bind/named.conf"]

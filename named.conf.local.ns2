@@ -1,6 +1,17 @@
+logging {
+    channel default_file {
+        file "/var/log/bind9.log" versions 3 size 5m;
+        print-time yes;
+        print-severity yes;
+        print-category yes;
+    };
+
+    category queries { default_file; };
+};
+
 zone "anubis.com" {
     type master;
-    file "/etc/bind/zones/ns1.amom.com";
+    file "/etc/bind/zones/ns1.anubis.com";
 };
 
 zone "google.com" {

@@ -1,0 +1,19 @@
+logging {
+    channel default_log {
+        file "/var/log/bind9.log";
+        print-time yes;
+        print-category yes;
+        print-severity yes;
+        severity info;
+    };
+
+    category queries { default_log; };
+};
+
+zone "anubis.com" {
+    type slave;
+    file "/etc/bind/zones/ns1.anubis.com";
+    masters { 
+        172.20.0.3; 
+    };
+};
