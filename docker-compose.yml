@@ -37,8 +37,6 @@ services:
     depends_on:
       - ns1
       - ns2
-    ports:
-      - "8081:80"
     expose:
       - "80"
     dns:
@@ -58,8 +56,6 @@ services:
     depends_on:
       - ns1
       - ns2
-    ports:
-      - "8080:80"
     expose:
       - "80"
     dns:
