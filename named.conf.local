@@ -2,3 +2,8 @@ zone "amom.com" {
     type master;
     file "/etc/bind/zones/ns1.amom.com";
 };
+
+zone "google.com" {
+    type master;
+    file "/etc/bind/zones/ns2.google.com";
+};

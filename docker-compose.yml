@@ -15,10 +15,12 @@ services:
         ipv4_address: 172.19.0.2
 
   app1:
-    image: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      args:
+        - app_name=app1
     container_name: app1
-    command: |
-      sh -c "apt update && apt install -y curl && echo "APP1" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
     depends_on:
       - bind9
     ports:
@@ -32,10 +34,12 @@ services:
         ipv4_address: 172.19.0.3
 
   app2:
-    image: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      args:
+        - app_name=app2
     container_name: app2
-    command: |
-      sh -c "apt update && apt install -y curl && echo "APP2" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
     depends_on:
       - bind9
     ports:
